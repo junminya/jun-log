@@ -38,6 +38,12 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
 
   return (
     <main className="max-w-3xl mx-auto p-8 font-sans">
+    {/* ▼▼▼ デバッグ用：取得したデータを全部見せる ▼▼▼ */}
+      <div className="bg-yellow-100 p-4 mb-4 border border-yellow-400 text-xs font-mono overflow-auto">
+        <p className="font-bold">DEBUG INFO:</p>
+        <pre>{JSON.stringify(blog, null, 2)}</pre>
+      </div>
+      {/* ▲▲▲ デバッグ用ここまで ▲▲▲ */}
       <h1 className="text-3xl font-bold mb-4">{blog.title}</h1>
       
       <div className="text-gray-500 text-sm mb-8">
