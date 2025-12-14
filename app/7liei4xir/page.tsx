@@ -27,7 +27,7 @@ async function getBlog(id: string) {
 }
 
 export default async function BlogPostPage({ params }: { params: { id: string } }) {
-  // paramsの扱いをNext.jsの仕様に合わせて安全化
+  // paramsの非同期解決
   const { id } = await Promise.resolve(params);
 
   const blog = await getBlog(id);
@@ -41,16 +41,20 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
       <h1 className="text-3xl font-bold mb-4">{blog.title}</h1>
       
       <div className="text-gray-500 text-sm mb-8">
-        {/* 日付がある場合のみ表示する安全策を追加 */}
-        {blog.publishedAt && (
-          <span>公開日: {new Date(blog.publishedAt).toLocaleDateString()}</span>
-        )}
+        {/* ▼ エラー回避の重要ポイント: 
+          suppressHydrationWarning をつけることで、
+          サーバー(UTC)とブラウザ(JST)で時間がズレていてもエラーにしないようにします 
+        */}
+        <span suppressHydrationWarning>
+           {/* 日付が存在する場合のみ表示 */}
+           {blog.publishedAt && new Date(blog.publishedAt).toLocaleDateString("ja-JP")}
+        </span>
       </div>
 
-      {/* ▼ ここが修正ポイント：カッコを二重 {{ }} にする */}
       <div 
         className="prose prose-lg max-w-none"
-        dangerouslySetInnerHTML={{ __html: blog.content }} 
+        // ▼ 万が一 content が undefined だった場合に備えて || "" を追加
+        dangerouslySetInnerHTML={{ __html: blog.content || "" }} 
       />
     </main>
   );
