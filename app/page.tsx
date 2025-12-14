@@ -1,3 +1,5 @@
+// ▼ この1行を追加（動的レンダリングを強制する設定）
+export const dynamic = 'force-dynamic';
 import { client } from "@/libs/client";
 
 // 記事の型定義
