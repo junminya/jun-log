@@ -1,6 +1,5 @@
 // 1. 先頭に Link をインポート
 import Link from "next/link"; 
-import { client } from "@/libs/client";
 
 // ▼ この1行を追加（動的レンダリングを強制する設定）
 export const dynamic = 'force-dynamic';
