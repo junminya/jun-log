@@ -1,3 +1,7 @@
+// 1. 先頭に Link をインポート
+import Link from "next/link"; 
+import { client } from "@/libs/client";
+
 // ▼ この1行を追加（動的レンダリングを強制する設定）
 export const dynamic = 'force-dynamic';
 import { client } from "@/libs/client";
@@ -23,12 +27,12 @@ export default async function Home() {
       <h1 className="text-4xl font-bold mb-8">My Super Blog</h1>
       
       <div className="grid gap-4">
-        {blogs.map((blog) => (
-          <article key={blog.id} className="border p-4 rounded shadow hover:shadow-lg transition">
+      {blogs.map((blog) => (
+        <Link href={`/${blog.id}`} key={blog.id} className="block group">
+    	  <article key={blog.id} className="border p-4 rounded shadow hover:shadow-lg transition">
             <h2 className="text-xl font-bold">{blog.title}</h2>
-            {/* 今はIDを表示しておきます */}
-            <p className="text-gray-500 text-sm mt-2">ID: {blog.id}</p>
           </article>
+	</Link>
         ))}
       </div>
     </main>
