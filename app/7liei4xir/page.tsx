@@ -4,22 +4,15 @@ export const dynamic = 'force-dynamic';
 import { client } from "@/libs/client";
 import { notFound } from "next/navigation";
 
-// 記事データの型定義
-type Blog = {
-  id: string;
-  title: string;
-  publishedAt: string;
-  content: string; 
-};
-
-// microCMSから特定の記事を取得
+// microCMSからデータを取得する関数
 async function getBlog(id: string) {
   try {
+    // API呼び出し: IDを指定して記事を取得
     const data = await client.get({
       endpoint: "blogs",
-      contentId: id,
+      contentId: id, 
     });
-    return data as Blog;
+    return data;
   } catch (error) {
     console.error("Fetch error:", error);
     return null;
@@ -27,39 +20,37 @@ async function getBlog(id: string) {
 }
 
 export default async function BlogPostPage({ params }: { params: { id: string } }) {
-  // paramsの非同期解決
   const { id } = await Promise.resolve(params);
+  
+  // データを取得 (この時点ではリスト形式かもしれないし、単一かもしれない)
+  const rawData: any = await getBlog(id);
 
-  const blog = await getBlog(id);
+  if (!rawData) {
+    notFound();
+  }
 
-  if (!blog) {
+  // ▼▼▼ ここが修正の肝です！ ▼▼▼
+  // もし "contents" という箱に入っていたら、その中身の1つ目を取り出す。
+  // そうでなければ、そのままデータを使う。
+  const blog = rawData.contents ? rawData.contents[0] : rawData;
+
+  // 念の為、記事データが空っぽなら404へ
+  if (!blog || !blog.title) {
     notFound();
   }
 
   return (
     <main className="max-w-3xl mx-auto p-8 font-sans">
-    {/* ▼▼▼ デバッグ用：取得したデータを全部見せる ▼▼▼ */}
-      <div className="bg-yellow-100 p-4 mb-4 border border-yellow-400 text-xs font-mono overflow-auto">
-        <p className="font-bold">DEBUG INFO:</p>
-        <pre>{JSON.stringify(blog, null, 2)}</pre>
-      </div>
-      {/* ▲▲▲ デバッグ用ここまで ▲▲▲ */}
       <h1 className="text-3xl font-bold mb-4">{blog.title}</h1>
       
       <div className="text-gray-500 text-sm mb-8">
-        {/* ▼ エラー回避の重要ポイント: 
-          suppressHydrationWarning をつけることで、
-          サーバー(UTC)とブラウザ(JST)で時間がズレていてもエラーにしないようにします 
-        */}
         <span suppressHydrationWarning>
-           {/* 日付が存在する場合のみ表示 */}
            {blog.publishedAt && new Date(blog.publishedAt).toLocaleDateString("ja-JP")}
         </span>
       </div>
 
       <div 
         className="prose prose-lg max-w-none"
-        // ▼ 万が一 content が undefined だった場合に備えて || "" を追加
         dangerouslySetInnerHTML={{ __html: blog.content || "" }} 
       />
     </main>
