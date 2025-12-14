@@ -1,4 +1,4 @@
-// ▼ ビルドエラー回避のため、ここでもSSR（動的生成）を強制します
+// ▼ SSR（動的生成）を強制
 export const dynamic = 'force-dynamic';
 
 import { client } from "@/libs/client";
@@ -9,10 +9,10 @@ type Blog = {
   id: string;
   title: string;
   publishedAt: string;
-  content: string; // HTMLとして返ってきます
+  content: string; 
 };
 
-// microCMSから特定の記事IDのデータを取得する関数
+// microCMSから特定の記事を取得
 async function getBlog(id: string) {
   try {
     const data = await client.get({
@@ -21,20 +21,17 @@ async function getBlog(id: string) {
     });
     return data as Blog;
   } catch (error) {
-    console.error(error);
+    console.error("Fetch error:", error);
     return null;
   }
 }
 
-// ページ本体
 export default async function BlogPostPage({ params }: { params: { id: string } }) {
-  // params は Promise なので await する必要がある場合があります（Next.jsのバージョンによる）
-  // 最新版では params を直接使えますが、念のため非同期として扱います
-  const { id } = await Promise.resolve(params); 
+  // paramsの扱いをNext.jsの仕様に合わせて安全化
+  const { id } = await Promise.resolve(params);
 
   const blog = await getBlog(id);
 
-  // 記事が見つからなかったら404ページへ
   if (!blog) {
     notFound();
   }
@@ -44,12 +41,13 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
       <h1 className="text-3xl font-bold mb-4">{blog.title}</h1>
       
       <div className="text-gray-500 text-sm mb-8">
-        公開日: {new Date(blog.publishedAt).toLocaleDateString()}
+        {/* 日付がある場合のみ表示する安全策を追加 */}
+        {blog.publishedAt && (
+          <span>公開日: {new Date(blog.publishedAt).toLocaleDateString()}</span>
+        )}
       </div>
 
-      {/* microCMSから返ってくるのはHTMLなので、dangerouslySetInnerHTMLで表示します 
-        prose クラスは Tailwind Typography (後で導入推奨) 用ですが、今はなくてOK
-      */}
+      {/* ▼ ここが修正ポイント：カッコを二重 {{ }} にする */}
       <div 
         className="prose prose-lg max-w-none"
         dangerouslySetInnerHTML={{ __html: blog.content }} 
