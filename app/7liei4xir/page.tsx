@@ -32,6 +32,33 @@ async function getBlog(id: string) {
   }
 }
 
+// ▼▼▼ 追加: SEO情報を動的に生成する関数 ▼▼▼
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const { id } = await Promise.resolve(params);
+  
+  // 記事データを取得（Next.jsが自動でキャッシュするので、下でまた呼んでも負荷は増えません）
+  const rawData: any = await getBlog(id);
+  const blog = rawData?.contents ? rawData.contents[0] : rawData;
+
+  if (!blog) {
+    return {
+      title: "記事が見つかりません",
+    };
+  }
+
+  return {
+    title: blog.title, // 記事のタイトル
+    description: "この記事の要約...", // 本来は本文から抽出したりしますが、一旦固定で
+    openGraph: {
+      title: blog.title,
+      description: "My Super Blogの記事です",
+      // アイキャッチ画像があればそれをOGP画像として設定
+      images: [blog.eyecatch?.url || ""], 
+    },
+  };
+}
+// ▲▲▲ 追加ここまで ▲▲▲
+//
 export default async function BlogPostPage({ params }: { params: { id: string } }) {
   const { id } = await Promise.resolve(params);
   
