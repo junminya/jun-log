@@ -6,6 +6,12 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Image from "next/image"; // ▼ 画像最適化コンポーネント
 
+// ▼ カテゴリの型定義を追加
+type Category = {
+  id: string;
+  name: string;
+};
+
 // 記事データの型定義
 type Blog = {
   id: string;
@@ -18,6 +24,8 @@ type Blog = {
     height: number;
     width: number;
   };
+  // ▼ カテゴリ情報を追加
+  category?: Category;
 };
 
 async function getBlog(id: string) {
@@ -91,6 +99,15 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
         </div>
       )}
 
+      {/* ▼ カテゴリバッジを表示 (カテゴリがある場合のみ) */}
+      {blog.category && (
+        <div className="mb-2">
+          <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+            {blog.category.name}
+          </span>
+        </div>
+      )}
+      
       <h1 className="text-3xl font-bold mb-4">{blog.title}</h1>
       
       <div className="text-gray-500 text-sm mb-8">
