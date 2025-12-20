@@ -1,39 +1,117 @@
-// 1. 先頭に Link をインポート
-import Link from "next/link"; 
-
-// ▼ この1行を追加（動的レンダリングを強制する設定）
+// ▼ SSR（動的生成）を強制
 export const dynamic = 'force-dynamic';
-import { client } from "@/libs/client";
 
-// 記事の型定義
+import { client } from "@/libs/client";
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import { Metadata } from "next";
+
+// ▼ カテゴリの型定義を追加
+type Category = {
+  id: string;
+  name: string;
+};
+
+// 記事データの型定義
 type Blog = {
   id: string;
   title: string;
+  publishedAt: string;
   content: string;
+  eyecatch?: {
+    url: string;
+    height: number;
+    width: number;
+  };
+  // ▼ カテゴリ情報を追加
+  category?: Category;
 };
 
-// microCMSからデータを取得する関数
-async function getBlogList() {
-  const data = await client.get({ endpoint: "blogs" });
-  return data.contents as Blog[];
+async function getBlog(id: string) {
+  try {
+    const data = await client.get({
+      endpoint: "blogs",
+      contentId: id, 
+    });
+    return data;
+  } catch (error) {
+    console.error("Fetch error:", error);
+    return null;
+  }
 }
 
-export default async function Home() {
-  const blogs = await getBlogList();
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const { id } = await Promise.resolve(params);
+  const rawData: any = await getBlog(id);
+  const blog = rawData?.contents ? rawData.contents[0] : rawData;
+
+  if (!blog) {
+    return { title: "記事が見つかりません" };
+  }
+
+  return {
+    title: blog.title,
+    description: "My Super Blogの記事です",
+    openGraph: {
+      title: blog.title,
+      description: "My Super Blogの記事です",
+      images: [blog.eyecatch?.url || ""], 
+    },
+  };
+}
+
+export default async function BlogPostPage({ params }: { params: { id: string } }) {
+  const { id } = await Promise.resolve(params);
+  
+  const rawData: any = await getBlog(id);
+
+  if (!rawData) {
+    notFound();
+  }
+
+  const blog = rawData.contents ? rawData.contents[0] : rawData;
+
+  if (!blog || !blog.title) {
+    notFound();
+  }
 
   return (
-    <main className="p-8 font-sans">
-      <h1 className="text-4xl font-bold mb-8">My Super Blog</h1>
+    <main className="max-w-3xl mx-auto p-8 font-sans">
+      {/* アイキャッチ画像 */}
+      {blog.eyecatch && (
+        <div className="mb-8">
+          <Image
+            src={blog.eyecatch.url}
+            width={blog.eyecatch.width}
+            height={blog.eyecatch.height}
+            alt="アイキャッチ画像"
+            className="rounded-lg w-full h-auto object-cover"
+            priority
+          />
+        </div>
+      )}
+
+      {/* ▼ カテゴリバッジを表示 (カテゴリがある場合のみ) */}
+      {blog.category && (
+        <div className="mb-2">
+          <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+            {blog.category.name}
+          </span>
+        </div>
+      )}
+
+      <h1 className="text-3xl font-bold mb-4">{blog.title}</h1>
       
-      <div className="grid gap-4">
-      {blogs.map((blog) => (
-        <Link href={`/${blog.id}`} key={blog.id} className="block group">
-    	  <article key={blog.id} className="border p-4 rounded shadow hover:shadow-lg transition">
-            <h2 className="text-xl font-bold">{blog.title}</h2>
-          </article>
-	</Link>
-        ))}
+      <div className="text-gray-500 text-sm mb-8">
+        <span suppressHydrationWarning>
+           {blog.publishedAt && new Date(blog.publishedAt).toLocaleDateString("ja-JP")}
+        </span>
       </div>
+
+      <div 
+        className="prose prose-lg max-w-none"
+        dangerouslySetInnerHTML={{ __html: blog.content || "" }} 
+      />
     </main>
   );
 }
