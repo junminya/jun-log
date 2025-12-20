@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 
 import { client } from "@/libs/client";
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 import Image from "next/image"; // ▼ 画像最適化コンポーネント
 
 // 記事データの型定義
