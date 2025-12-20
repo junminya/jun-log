@@ -1,3 +1,6 @@
+// ▼ ビルド時のエラーを避けるために、動的レンダリングを強制する
+export const dynamic = 'force-dynamic';
+
 import { client } from "@/libs/client";
 import Link from "next/link";
 import Image from "next/image";
