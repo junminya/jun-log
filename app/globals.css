@@ -2,8 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/* デフォルトの背景色などを設定（お好みで変更可能） */
+/* ▼ 以下は好みで追加する全体設定（なくても動きますが、あると綺麗です） */
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
 body {
-  background: #ffffff;
-  color: #1a202c;
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
 }
