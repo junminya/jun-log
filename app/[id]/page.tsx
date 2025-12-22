@@ -3,28 +3,25 @@ export const dynamic = 'force-dynamic';
 
 import { client } from "@/libs/client";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { Metadata } from "next";
-import Image from "next/image"; // ▼ 画像最適化コンポーネント
+import Link from "next/link"; // ★追加: リンク機能
 
-// ▼ カテゴリの型定義を追加
 type Category = {
   id: string;
   name: string;
 };
 
-// 記事データの型定義
 type Blog = {
   id: string;
   title: string;
   publishedAt: string;
   content: string;
-  // ▼ 画像用の型を追加
   eyecatch?: {
     url: string;
     height: number;
     width: number;
   };
-  // ▼ カテゴリ情報を追加
   category?: Category;
 };
 
@@ -41,33 +38,26 @@ async function getBlog(id: string) {
   }
 }
 
-// ▼▼▼ 追加: SEO情報を動的に生成する関数 ▼▼▼
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const { id } = await Promise.resolve(params);
-  
-  // 記事データを取得（Next.jsが自動でキャッシュするので、下でまた呼んでも負荷は増えません）
   const rawData: any = await getBlog(id);
   const blog = rawData?.contents ? rawData.contents[0] : rawData;
 
   if (!blog) {
-    return {
-      title: "記事が見つかりません",
-    };
+    return { title: "記事が見つかりません" };
   }
 
   return {
-    title: blog.title, // 記事のタイトル
-    description: "この記事の要約...", // 本来は本文から抽出したりしますが、一旦固定で
+    title: blog.title,
+    description: "My Super Blogの記事です",
     openGraph: {
       title: blog.title,
       description: "My Super Blogの記事です",
-      // アイキャッチ画像があればそれをOGP画像として設定
       images: [blog.eyecatch?.url || ""], 
     },
   };
 }
-// ▲▲▲ 追加ここまで ▲▲▲
-//
+
 export default async function BlogPostPage({ params }: { params: { id: string } }) {
   const { id } = await Promise.resolve(params);
   
@@ -85,7 +75,7 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
 
   return (
     <main className="max-w-3xl mx-auto p-8 font-sans">
-      {/* アイキャッチ画像があれば表示 */}
+      {/* アイキャッチ画像 */}
       {blog.eyecatch && (
         <div className="mb-8">
           <Image
@@ -94,20 +84,22 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
             height={blog.eyecatch.height}
             alt="アイキャッチ画像"
             className="rounded-lg w-full h-auto object-cover"
-            priority // 最初に表示される重要な画像なので優先読み込み
+            priority
           />
         </div>
       )}
 
-      {/* ▼ カテゴリバッジを表示 (カテゴリがある場合のみ) */}
+      {/* ▼ カテゴリバッジをリンクに変更 */}
       {blog.category && (
         <div className="mb-2">
-          <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
-            {blog.category.name}
-          </span>
+          <Link href={`/category/${blog.category.id}`}>
+            <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded hover:bg-blue-200 transition-colors cursor-pointer">
+              {blog.category.name}
+            </span>
+          </Link>
         </div>
       )}
-      
+
       <h1 className="text-3xl font-bold mb-4">{blog.title}</h1>
       
       <div className="text-gray-500 text-sm mb-8">

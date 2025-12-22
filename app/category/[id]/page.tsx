@@ -2,7 +2,7 @@ import { client } from "@/libs/client";
 import Link from "next/link";
 import Image from "next/image";
 
-// ▼ 常に最新データを取得
+// ▼ 常に最新データを取得するための設定
 export const dynamic = 'force-dynamic';
 
 type Blog = {
@@ -13,21 +13,22 @@ type Blog = {
   category?: { id: string; name: string };
 };
 
-// カテゴリIDで記事を絞り込んで取得
+// カテゴリIDで記事を絞り込んで取得する関数
 async function getBlogsByCategory(categoryId: string) {
   try {
     const data = await client.get({
       endpoint: "blogs",
-      // ▼ 修正点: 記号を取り除きました
+      // microCMSのフィルタ機能を使って絞り込み
       queries: { filters: `category[equals]${categoryId}` },
     });
     return data;
   } catch (error) {
+    console.error(error);
     return null;
   }
 }
 
-// カテゴリ自体の名前（「技術」など）を取得
+// カテゴリ自体の名前（「技術」など）を取得する関数
 async function getCategory(id: string) {
   try {
     const data = await client.get({
@@ -36,6 +37,7 @@ async function getCategory(id: string) {
     });
     return data;
   } catch (e) {
+    console.error(e);
     return null;
   }
 }
@@ -49,6 +51,7 @@ export default async function CategoryPage({ params }: { params: { id: string } 
     getCategory(id)
   ]);
 
+  // 記事がない場合の表示
   if (!data || data.contents.length === 0) {
     return (
       <div className="max-w-4xl mx-auto p-8 text-center">
@@ -69,9 +72,10 @@ export default async function CategoryPage({ params }: { params: { id: string } 
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {data.contents.map((blog: Blog) => (
-          // ▼ 修正点: ここも記号を取り除きました
           <Link href={`/${blog.id}`} key={blog.id} className="block group">
             <div className="border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-lg transition-shadow duration-300 bg-white h-full flex flex-col">
+              
+              {/* アイキャッチ画像 */}
               {blog.eyecatch && (
                 <div className="mb-4 overflow-hidden rounded-md">
                   <Image
@@ -83,9 +87,11 @@ export default async function CategoryPage({ params }: { params: { id: string } 
                   />
                 </div>
               )}
+
               <h2 className="text-xl font-bold mb-2 group-hover:text-blue-600">
                 {blog.title}
               </h2>
+              
               <div className="text-gray-500 text-sm mt-auto">
                 <span suppressHydrationWarning>
                   {new Date(blog.publishedAt).toLocaleDateString("ja-JP")}
