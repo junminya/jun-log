@@ -8,14 +8,14 @@ const inter = Inter({ subsets: ["latin"] });
 // ▼ SEO設定（以前の設定を維持）
 export const metadata: Metadata = {
   title: {
-    template: '%s | My Super Blog',
-    default: 'My Super Blog',
+    template: '%s | おーたログ',
+    default: 'おーたログ',
   },
-  description: "Next.jsとmicroCMSで作った最高の技術ブログです",
+  description: "Next.jsとmicroCMSで作った高速サイト",
   openGraph: {
     type: "website",
     locale: "ja_JP",
-    siteName: "My Super Blog",
+    siteName: "おーたログ",
   },
   twitter: {
     card: "summary_large_image",
@@ -51,7 +51,7 @@ export default function RootLayout({
           {/* ▼ フッター（全ページ共通） */}
           <footer className="bg-gray-100 text-center py-6 mt-8 border-t border-gray-200">
             <p className="text-gray-500 text-sm">
-              &copy; {new Date().getFullYear()} My Super Blog. All rights reserved.
+              &copy; {new Date().getFullYear()} おーたログ. All rights reserved.
             </p>
           </footer>
 
