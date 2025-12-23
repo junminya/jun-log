@@ -5,7 +5,8 @@ import { client } from "@/libs/client";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Metadata } from "next";
-import Link from "next/link"; // ★追加: リンク機能
+import Link from "next/link";
+import * as cheerio from "cheerio"; // ▼ 追加: HTML解析ライブラリ
 
 type Category = {
   id: string;
@@ -23,6 +24,13 @@ type Blog = {
     width: number;
   };
   category?: Category;
+};
+
+// 目次のデータ型
+type TOC = {
+  id: string;
+  text: string;
+  tag: string;
 };
 
 async function getBlog(id: string) {
@@ -60,7 +68,6 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
 export default async function BlogPostPage({ params }: { params: { id: string } }) {
   const { id } = await Promise.resolve(params);
-  
   const rawData: any = await getBlog(id);
 
   if (!rawData) {
@@ -72,6 +79,24 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
   if (!blog || !blog.title) {
     notFound();
   }
+
+  // ▼▼▼ 目次生成ロジック ▼▼▼
+  const $ = cheerio.load(blog.content);
+  const headings = $("h2, h3").toArray();
+  const toc: TOC[] = headings.map((data: any) => ({
+    text: $(data).text(),
+    id: $(data).text(), // 見出しのテキストをIDとして使用
+    tag: data.tagName,
+  }));
+
+  // 本文側の見出しにIDを埋め込む（これでクリック時に飛べるようになります）
+  $("h2, h3").each((_, elm) => {
+    $(elm).attr("id", $(elm).text());
+  });
+
+  const contentWithId = $.html(); // IDが埋め込まれた新しいHTML
+  // ▲▲▲ 目次生成ロジック終了 ▲▲▲
+
 
   return (
     <main className="max-w-3xl mx-auto p-8 font-sans">
@@ -89,7 +114,7 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
         </div>
       )}
 
-      {/* ▼ カテゴリバッジをリンクに変更 */}
+      {/* カテゴリバッジ */}
       {blog.category && (
         <div className="mb-2">
           <Link href={`/category/${blog.category.id}`}>
@@ -108,9 +133,29 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
         </span>
       </div>
 
+      {/* ▼▼▼ 目次の表示エリア（見出しがある場合のみ表示） ▼▼▼ */}
+      {toc.length > 0 && (
+        <div className="bg-gray-50 p-6 rounded-lg mb-8 border border-gray-200">
+          <p className="font-bold mb-4 text-lg">目次</p>
+          <ul className="space-y-2">
+            {toc.map((item) => (
+              <li key={item.id} className={item.tag === "h3" ? "ml-6 list-disc" : ""}>
+                <a 
+                  href={`#${item.id}`} 
+                  className="text-blue-600 hover:underline hover:text-blue-800 transition-colors"
+                >
+                  {item.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* 記事本文（ID埋め込み済みのHTMLを表示） */}
       <div 
         className="prose prose-lg max-w-none"
-        dangerouslySetInnerHTML={{ __html: blog.content || "" }} 
+        dangerouslySetInnerHTML={{ __html: contentWithId }} 
       />
     </main>
   );
