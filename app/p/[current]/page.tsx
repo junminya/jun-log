@@ -1,12 +1,12 @@
-// ▼ ビルド時のエラーを避けるために、動的レンダリングを強制する
-export const dynamic = 'force-dynamic';
-
 import { client } from "@/libs/client";
 import Link from "next/link";
 import Image from "next/image";
-import { Pagination, PER_PAGE } from "@/app/components/Pagination"; // ▼ 部品を読み込み
+import { Pagination, PER_PAGE } from "@/app/components/Pagination";
+import { notFound } from "next/navigation";
 
-// 記事データの型定義
+// ▼ 動的レンダリングを強制
+export const dynamic = 'force-dynamic';
+
 type Blog = {
   id: string;
   title: string;
@@ -18,20 +18,32 @@ type Blog = {
   };
 };
 
-// microCMSから記事一覧を取得（件数制限付き）
-async function getBlogs() {
+// ページ番号に応じた記事を取得
+async function getBlogs(current: number) {
   const data = await client.get({
     endpoint: "blogs",
     queries: {
-      offset: 0,
-      limit: PER_PAGE, // ▼ 6件だけ取得
+      offset: (current - 1) * PER_PAGE, // ▼ ここでずらす件数を計算（例: 2ページ目なら6件ずらす）
+      limit: PER_PAGE,
     },
   });
   return data;
 }
 
-export default async function Home() {
-  const data = await getBlogs();
+export default async function Page({ params }: { params: { current: string } }) {
+  const { current } = await Promise.resolve(params);
+  const currentPage = parseInt(current, 10);
+
+  if (isNaN(currentPage) || currentPage < 1) {
+    notFound();
+  }
+
+  const data = await getBlogs(currentPage);
+
+  // 記事がないページに来たら404
+  if (data.contents.length === 0) {
+    notFound();
+  }
 
   return (
     <main className="max-w-4xl mx-auto p-8 font-sans">
@@ -68,8 +80,8 @@ export default async function Home() {
         ))}
       </div>
 
-      {/* ▼ ページネーションボタンを表示 */}
-      <Pagination totalCount={data.totalCount} />
+      {/* ▼ 現在のページ番号を渡してボタンを表示 */}
+      <Pagination totalCount={data.totalCount} current={currentPage} />
     </main>
   );
 }
