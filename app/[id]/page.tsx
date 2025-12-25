@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Metadata } from "next";
 import Link from "next/link";
-import * as cheerio from "cheerio"; // ▼ 追加: HTML解析ライブラリ
+import * as cheerio from "cheerio";
 
 type Category = {
   id: string;
@@ -33,11 +33,14 @@ type TOC = {
   tag: string;
 };
 
-async function getBlog(id: string) {
+// 記事取得関数（draftKeyを受け取れるように変更）
+async function getBlog(id: string, draftKey?: string) {
   try {
     const data = await client.get({
       endpoint: "blogs",
-      contentId: id, 
+      contentId: id,
+      // ▼ 下書きキーがあればクエリに追加する
+      queries: draftKey ? { draftKey } : undefined,
     });
     return data;
   } catch (error) {
@@ -46,6 +49,7 @@ async function getBlog(id: string) {
   }
 }
 
+// メタデータ生成（ここも下書き対応は可能ですが、簡易化のため公開データのみ参照にします）
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const { id } = await Promise.resolve(params);
   const rawData: any = await getBlog(id);
@@ -57,18 +61,28 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
   return {
     title: blog.title,
-    description: "My Super Blogの記事です",
+    description: "おーたログの記事です",
     openGraph: {
       title: blog.title,
-      description: "My Super Blogの記事です",
+      description: "おーたログの記事です",
       images: [blog.eyecatch?.url || ""], 
     },
   };
 }
 
-export default async function BlogPostPage({ params }: { params: { id: string } }) {
+// ▼ searchParams（クエリパラメータ）を受け取る設定を追加
+export default async function BlogPostPage({ 
+  params, 
+  searchParams 
+}: { 
+  params: { id: string }, 
+  searchParams: { draftKey?: string } 
+}) {
   const { id } = await Promise.resolve(params);
-  const rawData: any = await getBlog(id);
+  const { draftKey } = await Promise.resolve(searchParams);
+  
+  // getBlogにdraftKeyを渡す
+  const rawData: any = await getBlog(id, draftKey);
 
   if (!rawData) {
     notFound();
@@ -85,21 +99,28 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
   const headings = $("h2, h3").toArray();
   const toc: TOC[] = headings.map((data: any) => ({
     text: $(data).text(),
-    id: $(data).text(), // 見出しのテキストをIDとして使用
+    id: $(data).text(),
     tag: data.tagName,
   }));
 
-  // 本文側の見出しにIDを埋め込む（これでクリック時に飛べるようになります）
   $("h2, h3").each((_, elm) => {
     $(elm).attr("id", $(elm).text());
   });
 
-  const contentWithId = $.html(); // IDが埋め込まれた新しいHTML
+  const contentWithId = $.html();
   // ▲▲▲ 目次生成ロジック終了 ▲▲▲
-
 
   return (
     <main className="max-w-3xl mx-auto p-8 font-sans">
+      
+      {/* ▼ プレビュー中であることを表示するバー */}
+      {draftKey && (
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-8" role="alert">
+          <p className="font-bold">プレビューモード</p>
+          <p>現在は下書きを表示しています。</p>
+        </div>
+      )}
+
       {/* アイキャッチ画像 */}
       {blog.eyecatch && (
         <div className="mb-8">
@@ -133,7 +154,7 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
         </span>
       </div>
 
-      {/* ▼▼▼ 目次の表示エリア（見出しがある場合のみ表示） ▼▼▼ */}
+      {/* 目次 */}
       {toc.length > 0 && (
         <div className="bg-gray-50 p-6 rounded-lg mb-8 border border-gray-200">
           <p className="font-bold mb-4 text-lg">目次</p>
@@ -152,7 +173,6 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
         </div>
       )}
 
-      {/* 記事本文（ID埋め込み済みのHTMLを表示） */}
       <div 
         className="prose prose-lg max-w-none"
         dangerouslySetInnerHTML={{ __html: contentWithId }} 
