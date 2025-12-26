@@ -37,6 +37,12 @@ export default function RootLayout({
               <Link href="/" className="text-xl font-bold hover:text-gray-300 transition-colors">
                 Tech Auto Log
               </Link>
+              {/* ▼ ここに追加：プロフィールへのリンク */}
+              <nav>
+                <Link href="/profile" className="text-sm font-medium hover:text-gray-300 transition-colors">
+                  Profile
+                </Link>
+              </nav>
             </div>
           </header>
 
