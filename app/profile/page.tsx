@@ -32,12 +32,13 @@ export default function ProfilePage() {
         <section className="mb-8">
           <h2 className="text-xl font-bold border-b pb-2 mb-4">About Me</h2>
           <p className="text-gray-700 leading-relaxed mb-4">
-            はじめまして！技術ブログ「おーたログ」を運営しています。
-            日々の学習のアウトプットや、開発で詰まったポイントの備忘録としてこのブログを立ち上げました。
+            はじめまして！ナレッジ蓄積ログ「Tech Auto Log」を運営しています。
+            日々の学習のアウトプットや、仕事上の失敗・課題を次に活かすための備忘録としてこのブログを立ち上げました。
           </p>
           <p className="text-gray-700 leading-relaxed">
-            現在はNext.jsとmicroCMSを使ったモダンなWeb開発に注力しています。
-            新しい技術に触れるのが好きで、週末は個人開発を楽しんでいます。
+            情報科学修士 。エンジニア、PMを経て→マーケ（CMO/事業責任者）→コンサルティングファームのシニアマネージャー
+            現在はデジタルファームで大型案件中心に、いろんなフェーズのプロマネを担当
+            経営戦略からシステムの実装までを走りる抜けるのが得意です
           </p>
         </section>
 
@@ -46,7 +47,7 @@ export default function ProfilePage() {
           <h2 className="text-xl font-bold border-b pb-2 mb-4">Skills</h2>
           <div className="flex flex-wrap gap-2">
             {/* 自分のスキルに合わせて書き換えてください */}
-            {["Next.js", "React", "TypeScript", "Tailwind CSS", "microCMS", "Git"].map((skill) => (
+            {[”プロジェクトマネジメント”,”事業開発","BPR","Enterprise Architecture"].map((skill) => (
               <span key={skill} className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
                 {skill}
               </span>
@@ -61,11 +62,6 @@ export default function ProfilePage() {
             <li>
               <a href="https://github.com/junminya" target="_blank" rel="noopener noreferrer" className="hover:underline">
                 GitHub (@junminya)
-              </a>
-            </li>
-            <li>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:underline">
-                X (Twitter)
               </a>
             </li>
           </ul>
