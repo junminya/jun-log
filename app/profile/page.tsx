@@ -23,7 +23,7 @@ export default function ProfilePage() {
             />
           </div>
           <div className="text-center md:text-left">
-            <h1 className="text-3xl font-bold mb-2">Jun Minya</h1>
+            <h1 className="text-3xl font-bold mb-2">Jun3</h1>
             <p className="text-gray-600">Project manager / Enterprise Architecht</p>
           </div>
         </div>
