@@ -24,7 +24,7 @@ export default function ProfilePage() {
           </div>
           <div className="text-center md:text-left">
             <h1 className="text-3xl font-bold mb-2">Jun Minya</h1>
-            <p className="text-gray-600">Web Developer / Blogger</p>
+            <p className="text-gray-600">Project manager / Enterprise Architecht</p>
           </div>
         </div>
 
@@ -32,13 +32,12 @@ export default function ProfilePage() {
         <section className="mb-8">
           <h2 className="text-xl font-bold border-b pb-2 mb-4">About Me</h2>
           <p className="text-gray-700 leading-relaxed mb-4">
-            はじめまして！ナレッジ蓄積ログ「Tech Auto Log」を運営しています。
-            日々の学習のアウトプットや、仕事上の失敗・課題を次に活かすための備忘録としてこのブログを立ち上げました。
+            はじめまして！Technology note「Tech Auto Log」を運営しています。
+            アーキテクチャーと読書ログの保管場所
           </p>
           <p className="text-gray-700 leading-relaxed">
             情報科学修士 。エンジニア、PMを経て→マーケ（CMO/事業責任者）→コンサルティングファームのシニアマネージャー
-            現在はデジタルファームで大型案件中心に、いろんなフェーズのプロマネを担当
-            経営戦略からシステムの実装までを走りる抜けるのが得意です
+            現在はデジタルファームで大型案件中心に、企画・構想から実装までのプロマネを担当
           </p>
         </section>
 
@@ -47,7 +46,7 @@ export default function ProfilePage() {
           <h2 className="text-xl font-bold border-b pb-2 mb-4">Skills</h2>
           <div className="flex flex-wrap gap-2">
             {/* 自分のスキルに合わせて書き換えてください */}
-            {[”プロジェクトマネジメント”,”事業開発","BPR","Enterprise Architecture"].map((skill) => (
+            {["プロジェクトマネジメント", "事業開発", "BPR", "Enterprise Architecture"].map((skill) => (
               <span key={skill} className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
                 {skill}
               </span>
