@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
-import { GoogleAnalytics } from "@next/third-parties/google"; // ▼ 追加
+import { GoogleAnalytics } from "@next/third-parties/google";
+import "highlight.js/styles/hybrid.css";
 
 const inter = Inter({ subsets: ["latin"] });
 

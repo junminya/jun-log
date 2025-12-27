@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Metadata } from "next";
 import Link from "next/link";
 import * as cheerio from "cheerio";
+import hljs from "highlight.js"; 
 import { ShareButton } from "@/app/components/ShareButton";
 
 type Category = {
@@ -108,6 +109,14 @@ export default async function BlogPostPage({
     $(elm).attr("id", $(elm).text());
   });
 
+// ▼▼▼ ここから追加（コードブロックの色付け） ▼▼▼
+  $('pre code').each((_, elm) => {
+    const result = hljs.highlightAuto($(elm).text());
+    $(elm).html(result.value);
+    $(elm).addClass('hljs');
+  });
+  // ▲▲▲ ここまで追加 ▲▲▲
+  
   const contentWithId = $.html();
   // ▲▲▲ 目次生成ロジック終了 ▲▲▲
 
