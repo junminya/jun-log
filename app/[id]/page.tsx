@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Metadata } from "next";
 import Link from "next/link";
 import * as cheerio from "cheerio";
+import { ShareButton } from "@/app/components/ShareButton";
 
 type Category = {
   id: string;
@@ -177,6 +178,7 @@ export default async function BlogPostPage({
         className="prose prose-lg max-w-none"
         dangerouslySetInnerHTML={{ __html: contentWithId }} 
       />
+      <ShareButton id={blog.id} title={blog.title} />
     </main>
   );
 }
