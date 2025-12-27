@@ -23,7 +23,7 @@ export default function ProfilePage() {
             />
           </div>
           <div className="text-center md:text-left">
-            <h1 className="text-3xl font-bold mb-2">Jun3</h1>
+            <h1 className="text-3xl font-bold mb-2">Jun@3</h1>
             <p className="text-gray-600">Project manager / Enterprise Architecht</p>
           </div>
         </div>
@@ -36,8 +36,10 @@ export default function ProfilePage() {
             アーキテクチャーと読書ログの保管場所
           </p>
           <p className="text-gray-700 leading-relaxed">
-            情報科学修士 。エンジニア、PMを経て→マーケ（CMO/事業責任者）→コンサルティングファームのシニアマネージャー
-            現在はデジタルファームで大型案件中心に、企画・構想から実装までのプロマネを担当
+            情報科学修士。エンジニア、PMを経て→マーケ（CMO/事業責任者）→外資コンサルファームのSM
+          </p>
+          <p className="text-gray-700 leading-relaxed">
+            現在はデジタルファームで大型案件中心に、Biz＆システムの企画・構想から実装・導入までのプロマネ
           </p>
         </section>
 
