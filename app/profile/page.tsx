@@ -32,13 +32,11 @@ export default function ProfilePage() {
         <section className="mb-8">
           <h2 className="text-xl font-bold border-b pb-2 mb-4">About Me</h2>
           <p className="text-gray-700 leading-relaxed mb-4">
-            はじめまして！Technology note「Tech Auto Log」を運営しています。
-            アーキテクチャーと読書ログの保管場所
+            はじめまして！「Tech Auto Log」を運営しています。
+            テクノロジーとビジネスを中心に日々、学んだことを整理してアウトプットしています。
           </p>
           <p className="text-gray-700 leading-relaxed">
-            情報科学修士。エンジニア、PMを経て→マーケ（CMO/事業責任者）→外資コンサルファームのSM
-          </p>
-          <p className="text-gray-700 leading-relaxed">
+            情報科学修士。エンジニア、PM→マーケ（CMO/事業責任者）→外資コンサルファームのシニア・マネージャーを経て、
             現在はデジタルファームで大型案件中心に、Biz＆システムの企画・構想から実装・導入までのプロマネ
           </p>
         </section>
