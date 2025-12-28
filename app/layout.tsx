@@ -60,7 +60,7 @@ export default function RootLayout({
         </div>
         {/* ▼ Google Analyticsコンポーネントを追加 */}
         {/* 環境変数からIDを読み込みます */}
-        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
+        <GoogleAnalytics gaId="G-7CKZBCBCQF" />
       </body>
     </html>
   );
