@@ -9,6 +9,7 @@ import Link from "next/link";
 import * as cheerio from "cheerio";
 import hljs from "highlight.js"; 
 import { ShareButton } from "@/app/components/ShareButton";
+import { Breadcrumb } from "@/app/components/Breadcrumb";
 
 type Category = {
   id: string;
@@ -120,8 +121,20 @@ export default async function BlogPostPage({
   const contentWithId = $.html();
   // ▲▲▲ 目次生成ロジック終了 ▲▲▲
 
+  // ▼▼▼ パンくずリストのデータ作成 ▼▼▼
+  const breadcrumbs = [
+    { name: "HOME", path: "/" },
+    // カテゴリがあれば真ん中に入れる
+    ...(blog.category ? [{ name: blog.category.name, path: `/category/${blog.category.id}` }] : []),
+    { name: blog.title }, // 最後に記事タイトル
+  ];
+  // ▲▲▲ ここまで追加 ▲▲▲
+
   return (
     <main className="max-w-3xl mx-auto p-8 font-sans">
+      
+      {/* ▼▼▼ ここに表示！ ▼▼▼ */}
+      <Breadcrumb lists={breadcrumbs} />
       
       {/* ▼ プレビュー中であることを表示するバー */}
       {draftKey && (
