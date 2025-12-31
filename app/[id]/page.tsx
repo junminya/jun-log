@@ -31,21 +31,6 @@ type Action = {
   type: string[]; // セレクトボックスは配列で返ってくることが多い
 };
 
-  // 繰り返しフィールドの型
-type Takeaway = {
-  fieldId: "takeaway"; // カスタムフィールドID
-  heading: string;
-  claim: string;
-  evidence: string;
-  interpretation: string;
-};
-
-type Action = {
-  fieldId: "action";
-  task: string;
-  type: string[]; // セレクトボックスは配列で返ってくることが多い
-};
-
 type Blog = {
   id: string;
   title: string;
