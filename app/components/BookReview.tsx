@@ -18,72 +18,66 @@ type Props = {
 
 export const BookReview = ({ blog }: Props) => {
   return (
-    <div className="font-sans text-gray-800 space-y-12">
+    <div className="font-sans text-stone-800 max-w-3xl mx-auto py-8">
       
-      {/* ヘッダー：書籍情報 */}
-      <header className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-        <div className="flex flex-col md:flex-row md:items-end gap-4 mb-4">
-          <h1 className="text-2xl font-bold text-gray-900 flex-1">
-            {blog.bookTitle || blog.title}
-          </h1>
-          <div className="text-sm text-gray-500 text-right">
-            <div>著：{blog.author}</div>
-            <div>読了：{blog.finishedAt ? new Date(blog.finishedAt).toLocaleDateString() : "-"}</div>
-          </div>
-        </div>
+      {/* Header: 雑誌の見出しのようなレイアウト */}
+      <header className="mb-12 text-center">
+        <p className="text-stone-500 font-serif italic mb-2">Reading Log / {blog.finishedAt ? new Date(blog.finishedAt).toLocaleDateString() : "-"}</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-stone-900 mb-4 leading-tight">
+          {blog.bookTitle || blog.title}
+        </h1>
+        <p className="text-sm text-stone-600 mb-8">by {blog.author}</p>
         
-        {/* 結論（1行） */}
-        <div className="mt-4 bg-white p-4 rounded border-l-4 border-blue-600 shadow-sm">
-          <p className="text-xs font-bold text-blue-600 mb-1">【結論】</p>
-          <p className="text-lg font-bold">{blog.oneLineConclusion}</p>
+        <div className="inline-block relative">
+          <span className="absolute -inset-1 bg-yellow-200 transform -skew-y-2 rounded-sm" aria-hidden="true"></span>
+          <p className="relative px-2 py-1 text-xl font-bold text-stone-900">
+            {blog.oneLineConclusion}
+          </p>
         </div>
       </header>
 
-      {/* 1. Why Now */}
-      <section>
-        <h2 className="text-xl font-bold border-b-2 border-gray-300 pb-2 mb-4">1. なぜ今この本か（Context）</h2>
-        <div 
-          className="prose max-w-none"
-          dangerouslySetInnerHTML={{ __html: blog.context || "" }}
-        />
-      </section>
-
-      {/* 2. 3行サマリー */}
-      {blog.summary3 && (
-        <section>
-          <h2 className="text-xl font-bold border-b-2 border-gray-300 pb-2 mb-4">2. 3行サマリー</h2>
-          <ul className="list-decimal list-inside space-y-2 bg-yellow-50 p-6 rounded-lg text-lg font-medium text-gray-800">
-            {/* microCMSの繰り返しフィールドの形式に合わせて調整してください */}
-            {blog.summary3.map((item: any, i: number) => (
-              <li key={i}>{item.text || item}</li>
-            ))}
-          </ul>
+      {/* 1. Context & 2. Summary */}
+      <div className="space-y-8 mb-16">
+        <section className="prose prose-stone prose-lg mx-auto">
+          <h2 className="font-serif italic text-2xl text-stone-900">Context</h2>
+          <div dangerouslySetInnerHTML={{ __html: blog.context || "" }} />
         </section>
-      )}
 
-      {/* 3. Key Takeaways */}
+        {blog.summary3 && (
+          <section className="bg-stone-100 p-8 rounded-tl-3xl rounded-br-3xl">
+            <h2 className="font-bold text-stone-900 mb-6 text-center text-lg tracking-widest uppercase">Summary</h2>
+            <ul className="space-y-4">
+              {blog.summary3.map((item: any, i: number) => (
+                <li key={i} className="text-lg font-medium leading-relaxed text-stone-800 text-center">
+                  <span className="text-yellow-600 font-bold mr-2">✦</span>
+                  {item.text || item}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+
+      <hr className="border-stone-200 mb-16 w-1/2 mx-auto" />
+
+      {/* 3. Takeaways: 引用のようなデザイン */}
       {blog.takeaways && (
-        <section>
-          <h2 className="text-xl font-bold border-b-2 border-gray-300 pb-2 mb-4">3. Key Takeaways</h2>
-          <div className="grid gap-6">
+        <section className="mb-16">
+          <h2 className="font-serif italic text-3xl text-stone-900 mb-8 text-center">Key Takeaways</h2>
+          <div className="space-y-12">
             {blog.takeaways.map((t: Takeaway, i: number) => (
-              <div key={i} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                <div className="bg-gray-100 px-4 py-2 font-bold border-b border-gray-200">
-                  Takeaway {i + 1}：{t.heading}
-                </div>
-                <div className="p-4 space-y-3">
-                  <div>
-                    <span className="font-bold text-blue-700 block text-sm">主張</span>
-                    <p>{t.claim}</p>
-                  </div>
-                  <div>
-                    <span className="font-bold text-gray-600 block text-sm">根拠</span>
-                    <p className="text-sm text-gray-600">{t.evidence}</p>
-                  </div>
-                  <div className="bg-blue-50 p-3 rounded">
-                    <span className="font-bold text-blue-800 block text-sm">解釈・現場での意味</span>
-                    <p className="text-blue-900 font-medium">{t.interpretation}</p>
-                  </div>
+              <div key={i} className="relative pl-6 md:pl-0">
+                {/* 装飾線 */}
+                <div className="hidden md:block absolute left-0 top-0 bottom-0 w-px bg-stone-300"></div>
+                <div className="hidden md:block absolute left-[-4px] top-6 w-2 h-2 rounded-full bg-stone-400"></div>
+                
+                <div className="md:pl-12">
+                   <h3 className="text-xl font-bold text-stone-900 mb-3">{t.heading}</h3>
+                   <div className="bg-yellow-50/50 border-l-4 border-yellow-300 p-4 mb-4">
+                     <p className="text-lg font-bold text-stone-800">{t.claim}</p>
+                   </div>
+                   <p className="text-stone-600 text-sm mb-2">Evidence: {t.evidence}</p>
+                   <p className="text-stone-700 italic font-medium">“ {t.interpretation} ”</p>
                 </div>
               </div>
             ))}
@@ -91,59 +85,32 @@ export const BookReview = ({ blog }: Props) => {
         </section>
       )}
 
-      {/* 4. 前提条件 */}
-      <section>
-        <h2 className="text-xl font-bold border-b-2 border-gray-300 pb-2 mb-4">4. 反論・前提・適用条件</h2>
-        <div 
-          className="prose max-w-none bg-gray-50 p-4 rounded"
-          dangerouslySetInnerHTML={{ __html: blog.assumptions || "" }}
-        />
-      </section>
-
-      {/* 5. Next Actions */}
+      {/* 5. Actions */}
       {blog.actions && (
-        <section>
-          <h2 className="text-xl font-bold border-b-2 border-gray-300 pb-2 mb-4">5. Next Actions</h2>
-          <div className="space-y-2">
-            {blog.actions.map((action: Action, i: number) => (
-              <div key={i} className="flex items-start gap-3 p-3 border rounded hover:bg-gray-50 transition">
-                <input type="checkbox" className="mt-1.5 w-5 h-5 text-blue-600" />
-                <div>
-                  <span className="text-xs font-bold text-white bg-gray-500 px-2 py-0.5 rounded mr-2">
-                    {action.type[0]}
-                  </span>
-                  <span className="font-medium">{action.task}</span>
-                </div>
-              </div>
-            ))}
+        <section className="mb-16">
+          <h2 className="font-serif italic text-2xl text-stone-900 mb-6">Next Actions</h2>
+          <div className="border-t-2 border-b-2 border-stone-900 py-6">
+            <ul className="grid gap-4">
+              {blog.actions.map((action: Action, i: number) => (
+                <li key={i} className="flex items-baseline gap-4">
+                  <span className="font-mono text-stone-400">0{i+1}</span>
+                  <div>
+                    <span className="text-xs font-bold border border-stone-800 px-2 py-0.5 rounded-full mr-2">
+                      {action.type[0]}
+                    </span>
+                    <span className="font-medium text-lg decoration-stone-300 underline underline-offset-4">{action.task}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
       )}
 
-      {/* 6. 実践ログ */}
-      {blog.practiceLog && (
-        <section>
-          <h2 className="text-xl font-bold border-b-2 border-gray-300 pb-2 mb-4">6. 実践ログ（追記）</h2>
-          <div 
-            className="prose max-w-none border-l-4 border-green-500 pl-4"
-            dangerouslySetInnerHTML={{ __html: blog.practiceLog }}
-          />
-        </section>
-      )}
-
-      {/* 7. ターゲット */}
-      {blog.targetRoles && (
-        <section>
-          <h2 className="text-sm font-bold text-gray-500 mb-2">この記事のおすすめターゲット</h2>
-          <div className="flex flex-wrap gap-2">
-            {blog.targetRoles.map((role: string, i: number) => (
-              <span key={i} className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">
-                {role}
-              </span>
-            ))}
-          </div>
-        </section>
-      )}
+      <section className="text-center">
+         {/* AssumptionsやLogは控えめに配置 */}
+         <div className="prose prose-sm prose-stone mx-auto text-stone-500" dangerouslySetInnerHTML={{ __html: blog.assumptions || "" }} />
+      </section>
     </div>
   );
 };
