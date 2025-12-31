@@ -31,18 +31,6 @@ type Action = {
   type: string[]; // セレクトボックスは配列で返ってくることが多い
 };
 
-
-type Blog = {
-  id: string;
-  title: string;
-  publishedAt: string;
-  content: string;
-  eyecatch?: {
-    url: string;
-    height: number;
-    width: number;
-  };
-  category?: Category;
   // 繰り返しフィールドの型
 type Takeaway = {
   fieldId: "takeaway"; // カスタムフィールドID
@@ -58,16 +46,18 @@ type Action = {
   type: string[]; // セレクトボックスは配列で返ってくることが多い
 };
 
-// ブログ本体の型（既存のものに追加）
 type Blog = {
   id: string;
   title: string;
   publishedAt: string;
   content: string;
-  category?: {
-    id: string;
-    name: string;
+  eyecatch?: {
+    url: string;
+    height: number;
+    width: number;
   };
+  category?: Category;
+
   // ▼▼▼ 追加：読書記録用（すべてオプショナル ? をつける） ▼▼▼
   bookTitle?: string;
   author?: string;
@@ -191,7 +181,7 @@ export default async function BlogPostPage({
       </main>
     );
   }
-  
+
   // ▼▼▼ それ以外（通常の技術記事）はいつもの表示 ▼▼▼
   return (
     <main className="max-w-3xl mx-auto p-8 font-sans">
