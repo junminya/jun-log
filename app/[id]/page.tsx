@@ -10,11 +10,27 @@ import * as cheerio from "cheerio";
 import hljs from "highlight.js"; 
 import { ShareButton } from "@/app/components/ShareButton";
 import { Breadcrumb } from "@/app/components/Breadcrumb";
+import { BookReview } from "@/app/components/BookReview";
 
 type Category = {
   id: string;
   name: string;
 };
+// 繰り返しフィールドの型
+type Takeaway = {
+  fieldId: "takeaway"; // カスタムフィールドID
+  heading: string;
+  claim: string;
+  evidence: string;
+  interpretation: string;
+};
+
+type Action = {
+  fieldId: "action";
+  task: string;
+  type: string[]; // セレクトボックスは配列で返ってくることが多い
+};
+
 
 type Blog = {
   id: string;
@@ -27,6 +43,44 @@ type Blog = {
     width: number;
   };
   category?: Category;
+  // 繰り返しフィールドの型
+type Takeaway = {
+  fieldId: "takeaway"; // カスタムフィールドID
+  heading: string;
+  claim: string;
+  evidence: string;
+  interpretation: string;
+};
+
+type Action = {
+  fieldId: "action";
+  task: string;
+  type: string[]; // セレクトボックスは配列で返ってくることが多い
+};
+
+// ブログ本体の型（既存のものに追加）
+type Blog = {
+  id: string;
+  title: string;
+  publishedAt: string;
+  content: string;
+  category?: {
+    id: string;
+    name: string;
+  };
+  // ▼▼▼ 追加：読書記録用（すべてオプショナル ? をつける） ▼▼▼
+  bookTitle?: string;
+  author?: string;
+  finishedAt?: string;
+  oneLineConclusion?: string;
+  context?: string; // Why Now
+  summary3?: { text: string }[]; // 繰り返しの設定による（単純なテキスト配列かオブジェクトか確認要）
+  takeaways?: Takeaway[];
+  assumptions?: string;
+  actions?: Action[];
+  practiceLog?: string;
+  targetRoles?: string[];
+  // ▲▲▲ 追加ここまで ▲▲▲
 };
 
 // 目次のデータ型
@@ -129,7 +183,16 @@ export default async function BlogPostPage({
     { name: blog.title }, // 最後に記事タイトル
   ];
   // ▲▲▲ ここまで追加 ▲▲▲
-
+  // カテゴリ名が「読書記録」だったら、専用テンプレートを返す
+  if (blog.category?.name === "読書記録") {
+    return (
+      <main className="max-w-4xl mx-auto p-6 md:p-12 font-sans bg-white">
+        <BookReview blog={blog} />
+      </main>
+    );
+  }
+  
+  // ▼▼▼ それ以外（通常の技術記事）はいつもの表示 ▼▼▼
   return (
     <main className="max-w-3xl mx-auto p-8 font-sans">
       
