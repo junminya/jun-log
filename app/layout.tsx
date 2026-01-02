@@ -1,6 +1,3 @@
-// ▼ SSR（動的生成）を強制
-export const dynamic = 'force-dynamic';
-
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";

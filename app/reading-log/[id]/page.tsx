@@ -1,6 +1,3 @@
-// ▼ SSR（動的生成）を強制
-export const dynamic = 'force-dynamic';
-
 import { client } from "@/libs/client";
 import { notFound } from "next/navigation";
 import { ShareButton } from "@/app/components/ShareButton";
