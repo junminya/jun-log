@@ -12,6 +12,10 @@ import { ShareButton } from "@/app/components/ShareButton";
 import { Breadcrumb } from "@/app/components/Breadcrumb";
 import { BookReview } from "@/app/components/BookReview";
 
+
+// Endpoint設定
+const ENDPOINT = "blogs"; 
+
 type Category = {
   id: string;
   name: string;
@@ -66,10 +70,10 @@ type TOC = {
 };
 
 // 記事取得関数（draftKeyを受け取れるように変更）
-async function getBlog(id: string, draftKey?: string) {
+async function getContent(id: string, draftKey?: string) {
   try {
     const data = await client.get({
-      endpoint: "blogs",
+      endpoint: ENDPOINT,
       contentId: id,
       // ▼ 下書きキーがあればクエリに追加する
       queries: draftKey ? { draftKey } : undefined,
@@ -84,7 +88,7 @@ async function getBlog(id: string, draftKey?: string) {
 // メタデータ生成（ここも下書き対応は可能ですが、簡易化のため公開データのみ参照にします）
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const { id } = await Promise.resolve(params);
-  const rawData: any = await getBlog(id);
+  const rawData: any = await getContent(id);
   const blog = rawData?.contents ? rawData.contents[0] : rawData;
 
   if (!blog) {
@@ -114,7 +118,7 @@ export default async function BlogPostPage({
   const { draftKey } = await Promise.resolve(searchParams);
   
   // getBlogにdraftKeyを渡す
-  const rawData: any = await getBlog(id, draftKey);
+  const rawData: any = await getContent(id, draftKey);
 
   if (!rawData) {
     notFound();
@@ -158,14 +162,6 @@ export default async function BlogPostPage({
     { name: blog.title }, // 最後に記事タイトル
   ];
   // ▲▲▲ ここまで追加 ▲▲▲
-  // カテゴリ名が「読書記録」だったら、専用テンプレートを返す
-  if (blog.category?.name === "読書記録") {
-    return (
-      <main className="max-w-4xl mx-auto p-6 md:p-12 font-sans bg-white">
-        <BookReview blog={blog} />
-      </main>
-    );
-  }
 
   // ▼▼▼ それ以外（通常の技術記事）はいつもの表示 ▼▼▼
   return (
