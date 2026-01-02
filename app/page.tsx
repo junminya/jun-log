@@ -33,49 +33,50 @@ async function getBlogs() {
 }
 
 export default async function Home() {
-  // const data = await getBlogs();
-  // 1. ブログデータを取得
-  // (A) ブログのデータを取得
-  const blogsData = await client.get({ 
-    endpoint: "blogs",
-    queries: { limit: 4 } // 必要に応じて件数制限など
-  });
-
-  // (B). 読書記録データを取得（※まだAPIやデータがない場合は空配列にするか、コメントアウトでOK）
-  // const booksData = await client.get({ endpoint: "reading-logs" });
 
   // ------------------------------------------------
-  // 2. データの整形・統合（★ご質問の箇所）
+  // 1. データ取得（並列実行で高速化）
   // ------------------------------------------------
-  const contents = [
-    // (A) ブログデータ： basePath: "/blog" を付与
-    ...blogsData.contents.map((article: Article) => ({
-      ...article,
-      basePath: "/blog", 
+  // 両方のAPIから「最新5件ずつ」取得すれば、最終的なトップ5は必ずこの中に含まれます
+  const [blogsData, booksData] = await Promise.all([
+    client.get({ endpoint: "blogs", queries: { limit: 5 } }),
+    client.get({ endpoint: "reading-logs", queries: { limit: 5 } }),
+  ]);
+
+// ------------------------------------------------
+  // 2. データの整形・統合
+  // ------------------------------------------------
+  const allArticles: Article[] = [
+    // ブログデータ
+    ...blogsData.contents.map((post: any) => ({
+      ...post,
+      basePath: "/blog",
+      label: "ブログ",
     })),
-
-    // (B) 読書記録データ： basePath: "/reading-log" を付与（※準備完了後に有効化）
-    /*
-    ...booksData.contents.map((article: Article) => ({
+    // 読書記録データ
+    ...booksData.contents.map((post: any) => ({
       ...post,
       basePath: "/reading-log",
+      label: "読書記録",
     })),
-    */
   ];
 
   // ------------------------------------------------
   // 3. 日付順に並び替え（新しい順）
   // ------------------------------------------------
-  contents.sort((a, b) => 
+  allArticles.sort((a, b) => 
     new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
   );
 
+  // 上位5件だけを切り出す
+  const recentPosts = allArticles.slice(0, 5);
+
   return (
     <main className="max-w-4xl mx-auto p-8 font-sans">
-      <h1 className="text-4xl font-bold mb-12 text-center">Tech Auto Log</h1>
+      <h1 className="text-4xl font-bold mb-12 text-center">新着記事</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {contents.map((article) => (
+          {recentPosts.map((article) => (
           <Link 
             key={article.id} 
             href={`${article.basePath}/${article.id}`}
