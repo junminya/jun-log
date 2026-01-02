@@ -1,47 +1,28 @@
-FROM node:20-alpine AS base
+# Dockerfile
 
-# Install dependencies only when needed
-FROM base AS deps
+# 1. ベースイメージの指定
+FROM node:20-alpine
+
+# 2. 作業ディレクトリの作成
 WORKDIR /app
-COPY package.json package-lock.json* ./
+
+# 3. 依存関係のインストール
+COPY package.json package-lock.json ./
 RUN npm ci
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# 4. ソースコードのコピー
 COPY . .
 
-# Next.jsのテレメトリ(利用統計送信)を無効化
-ENV NEXT_TELEMETRY_DISABLED 1
+# ★重要：ビルド時に外からキーを受け取る設定
+ARG MICROCMS_SERVICE_DOMAIN
+ARG MICROCMS_API_KEY
 
+# 受け取ったキーを環境変数としてセットする
+ENV MICROCMS_SERVICE_DOMAIN=$MICROCMS_SERVICE_DOMAIN
+ENV MICROCMS_API_KEY=$MICROCMS_API_KEY
+
+# 5. ビルド実行（ここで環境変数が使われる）
 RUN npm run build
 
-# Production image, copy all the files and run next
-FROM base AS runner
-WORKDIR /app
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-COPY --from=builder /app/public ./public
-
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# Automatically leverage output traces to reduce image size
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
-
-EXPOSE 3000
-
-ENV PORT 3000
-# set hostname to localhost
-ENV HOSTNAME "0.0.0.0"
-
-CMD ["node", "server.js"]
+# 6. 起動コマンド
+CMD ["npm", "start"]

@@ -1,0 +1,34 @@
+# cloudbuild.yaml
+steps:
+  # 1. Dockerイメージのビルド
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--build-arg'
+      - 'MICROCMS_SERVICE_DOMAIN=$_MICROCMS_SERVICE_DOMAIN' # 変数を注入
+      - '--build-arg'
+      - 'MICROCMS_API_KEY=$_MICROCMS_API_KEY'             # 変数を注入
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/my-blog-service'
+      - '.'
+
+  # 2. イメージのプッシュ（保存）
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/my-blog-service']
+
+  # 3. Cloud Runへのデプロイ
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'my-blog-service'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/my-blog-service'
+      - '--region'
+      - 'asia-northeast1' # 東京リージョン
+      - '--allow-unauthenticated'
+
+# ログ設定など
+images:
+  - 'gcr.io/$PROJECT_ID/my-blog-service'
