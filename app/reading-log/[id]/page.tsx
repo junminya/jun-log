@@ -1,7 +1,8 @@
+// ▼ SSR（動的生成）を強制
+export const dynamic = 'force-dynamic';
+
 import { client } from "@/libs/client";
 import { notFound } from "next/navigation";
-// もし BookReview コンポーネントがまだない場合は、ここを一旦コメントアウトし、
-// 下の return 内を simple な <div>{post.title}</div> などに書き換えてください。
 import { ShareButton } from "@/app/components/ShareButton";
 import { Breadcrumb } from "@/app/components/Breadcrumb";
 import { BookReview } from "@/app/components/BookReview";
