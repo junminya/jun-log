@@ -32,3 +32,6 @@ steps:
 # ログ設定など
 images:
   - 'gcr.io/$PROJECT_ID/my-blog-service'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
